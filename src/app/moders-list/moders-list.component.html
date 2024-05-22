@@ -1,0 +1,26 @@
+<div class="container-md">
+  <div class="row ">
+      <app-leftcontainer class="col-2 py-3 border-end"></app-leftcontainer>
+
+      <div class="col-8 py-3">
+        <div class="container-md">
+          <div class="row ">
+            <h4><a routerLink="/moders">Moders</a></h4>
+        
+            <ul *ngIf="moderList != [] || 'Модеров нет!'">
+              <li *ngFor="let moder of moderList">
+                <p>{{moder}}</p>
+                <p>Mail: {{moderEmailList}}</p>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <app-rightcontainer class="col-2 py-3 border-start"></app-rightcontainer>
+  </div>
+</div>
+
+
+
+

@@ -1,0 +1,16 @@
+
+<button (click)="googleSignIn()">Sign-in</button>
+<button (click)="signOut()">Signout</button>
+
+<span>
+  {{ (user$ | async)?.displayName || 'Вы не залогинены' }}
+</span>
+
+
+<ul>
+    <li class="text" *ngFor="let item of data | async">
+      {{item.name}} / {{item.email}}
+      <button (click)="updateData(item.id)">Edit</button>
+      <button (click)="deleteData(item.id)">Delete</button>
+    </li>
+</ul>

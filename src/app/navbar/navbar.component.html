@@ -1,0 +1,18 @@
+<nav class="navbar navbar-expand-lg bg-body-tertiary border-bottom border-bottom-1">
+    <div class="container-md">
+        <a class="navbar-brand col-2" routerLink="/home">{{header_logo}}</a>    
+        <form class="d-flex me-2 col-7" role="search">
+            <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+            <button class="btn btn-outline-success" type="submit">Search</button>
+        </form>
+
+        <div class="nav-item col-3 text-end">
+            <button *ngIf="login" (click)="googleSignIn()" type="button" class="btn btn-primary nav-item me-2">{{login}}</button>
+            <button *ngIf="signout === 'logined'" (click)="signOut()" type="button" class="btn btn-danger nav-item me-2">Signout</button>
+        </div>      
+        
+    </div>
+  </nav>
+
+
+
