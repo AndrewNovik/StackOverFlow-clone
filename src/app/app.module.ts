@@ -19,6 +19,7 @@ import { UsersListComponent } from './users-list/users-list.component';
 import { AskquestionComponent } from './askquestion/askquestion.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AsksAndAnswersComponent } from './asks-and-answers/asks-and-answers.component';
+import { SortRatingsPipe } from './sort-ratings.pipe';
 
 @NgModule({
   declarations: [
@@ -32,7 +33,8 @@ import { AsksAndAnswersComponent } from './asks-and-answers/asks-and-answers.com
     ModersListComponent,
     UsersListComponent,
     AskquestionComponent,
-    AsksAndAnswersComponent
+    AsksAndAnswersComponent,
+    SortRatingsPipe
   ],
   imports: [
     BrowserModule,

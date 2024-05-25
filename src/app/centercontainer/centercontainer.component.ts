@@ -3,6 +3,8 @@ import { Auth, user } from '@angular/fire/auth';
 import { Firestore, collection, collectionData, addDoc, doc, updateDoc, deleteDoc} from '@angular/fire/firestore';
 import { FormControl, FormGroup, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { Observable, Subject, take, takeUntil, zip } from 'rxjs';
+import { OpenCloseService } from '../open-close.service';
+import { DataMethodsService } from '../data-methods.service';
 
 @Component({
   selector: 'app-centercontainer',
@@ -21,13 +23,15 @@ export class CentercontainerComponent implements OnInit {
   adminEmail:string = 'vitalevich16@gmail.com';
   IsAdmin = false;
   dataAnswers:string[] = [];
-  answerAreaOpen:string[] = [];
   destroed = new Subject();
 
   private auth: Auth = inject(Auth);
   user$ = user(this.auth);
   currentUserEmail?:string | null = '';
-  constructor() {}
+
+
+
+  constructor(public openClose: OpenCloseService, public dataMethods: DataMethodsService) { }
 
   deepEqual (obj1: any, obj2: any){
     return JSON.stringify(obj1)===JSON.stringify(obj2);
@@ -35,6 +39,7 @@ export class CentercontainerComponent implements OnInit {
 
   ngOnInit(): void {
     this.getData();
+
   }
 
   getData(){
@@ -66,9 +71,8 @@ export class CentercontainerComponent implements OnInit {
     zip(this.user$, this.data$).pipe(take(1)).subscribe(([user,data]) => {
       
       if(newForm.valid){
-        let answersArr: {}[] | { answerId:number; answerAuthorEmail: string; body: string; isTrue: boolean; rate: number; }[] = [];
+        let answersArr: { answerId:number; answerAuthorEmail: string; body: string; isTrue: boolean; rate: number; }[] = [];
         const a = newForm.getRawValue(); 
-        let newId:number;
         for (let x of data){
           if (x.id == id){
             for (let m of x.answers){
@@ -83,7 +87,7 @@ export class CentercontainerComponent implements OnInit {
           }     
         }
         answersArr.push({answerId: this.newId, answerAuthorEmail:`${user?.email}`, body:`${a.answers}`, isTrue:false, rate:0});
-        this.updateData(id, {
+        this.dataMethods.updateData(id, this.firestore, 'questions', {
           answers:answersArr,
         }); 
 
@@ -92,24 +96,14 @@ export class CentercontainerComponent implements OnInit {
         alert('Надеемся что это ответ здорового человека!')
         
         this.answerForm.reset();
-        this.closeAnswerForm(id);
+        this.openClose.closeAnswerForm(id);
       } else {
         alert('Заполните нормально свой ответ или авторизуйтесь!')
       }
     }); 
 
   }
-  
-  updateData(id:string, f:any){
-    const aCollection = doc(this.firestore, 'questions', id)
-
-    updateDoc(aCollection, f)
-      .then(()=>{
-      }).catch((err)=>{
-        console.log(err)
-      })
-  }
-  
+    
   changeRate(id:string, i:number, value:number){
     this.data$.pipe(take(1)).subscribe(data => {
       let answersArr: {}[] | { answerId:number; answerAuthorEmail: string; body: string; isTrue: boolean; rate: number; }[] = [];
@@ -123,7 +117,7 @@ export class CentercontainerComponent implements OnInit {
           }       
         }     
       }
-      this.updateData(id, {
+      this.dataMethods.updateData(id, this.firestore, 'questions',{
         answers: answersArr
         });
     })
@@ -144,27 +138,9 @@ export class CentercontainerComponent implements OnInit {
           }       
         }     
       }
-      this.updateData(id, {
+      this.dataMethods.updateData(id, this.firestore, 'questions',{
         answers: answersArr
         });
     })
-  }
-
-
-
-
-  // Works!
-  openAnswerForm(id:string){
-    if (this.answerAreaOpen.includes(id) != true){
-      this.answerAreaOpen.push(id);
-    }
-  }
-  // Works!
-  closeAnswerForm(id:string){
-    for (let i=0;i<this.answerAreaOpen.length;i++){
-      if (this.answerAreaOpen[i]==id){
-        this.answerAreaOpen.splice(i,1)
-      }
-    }
   }
 }

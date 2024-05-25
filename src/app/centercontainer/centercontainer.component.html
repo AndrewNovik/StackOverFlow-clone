@@ -9,8 +9,9 @@
     </div>
 </div>
 
+@if (data$ | async; as data) { @for (item of data; track item.id){
 
-    <div class="card m-3 bg-body-tertiary" *ngFor="let item of data$ | async"> 
+    <div class="card m-3 bg-body-tertiary"> 
         <div class="card-body">
             <div class="row">
                 <div class="col-md-8">
@@ -19,48 +20,64 @@
                     <small class="card-text">{{item.authorEmail}}</small><br>
                 </div>
                 <div class="col-md-4 text-center">
-                    <button class="btn btn-primary m-2" *ngIf="item.authorEmail != currentUserEmail" (click)="openAnswerForm(item.id)" >Answer</button>
-                    <button class="btn btn-danger m-2" *ngIf="IsAdmin == true" (click)="DeleteQuestion(item.id)" >Del question!</button> 
+
+                    @if (item.authorEmail != currentUserEmail ){
+                        <button class="btn btn-primary m-2" (click)="openClose.openAnswerForm(item.id)" >Answer</button>
+                    }
+                    @if (IsAdmin == true){
+                        <button class="btn btn-danger m-2" (click)="DeleteQuestion(item.id)" >Del question!</button> 
+                    }
+                    
                 </div>
             </div>
-                <div *ngIf="deepEqual(item.answers[0],{}) != true">
-                    <h2>Answers:</h2>
-                    <ol class="bg-body-tertiary list-group">
-                        <div *ngFor="let i of item.answers">
-                            <!--Сюда нужно научиться закидывать классы-->
-                            <li class="list-group-item border-bottom border-bottom-1 my-1">
-                            <div class="row">
-                                <div class="col-md-8">
-                                    <p>{{i.body}}</p>
-                                    <small>author: {{i.answerAuthorEmail}}</small><br />
-                                    <p>{{i.istrue}}</p>
-                                </div>
-                                <div class="col-md-4 text-center">
-                                    <button class="badge bg-success rounded-pill border-0 me-1" (click)="changeRate(item.id, i.answerId, 1)">&#10004;</button>
-                                    <span class="badge bg-primary rounded-pill">{{i.rate}}</span>
-                                    <button class="badge bg-warning rounded-pill border-0 ms-1" (click)="changeRate(item.id, i.answerId, -1)">&#10008;</button><br />
-                                    <button class="btn btn-outline-secondary m-2" *ngIf="i.isTrue == false && item.authorEmail == currentUserEmail" (click)="checkRightAnswer(item.id, i.answerId)" >is it right?</button>
-                                    <span class="btn btn-success m-2" *ngIf="i.isTrue == true " >It is right! &#10004;</span>
-                                </div>
-                            </div>
-                            </li>
-                        </div>
-                    </ol>
-                </div>
-            <!-- Тут функционал ответа на вопросики. Не знаю как отследить нажатие на кнопку и в зависимости от этого показывать поле для ответа ниже, поэтому делаю переменную в функции -->
-            <div *ngIf="answerAreaOpen.includes(item.id)">
+            @if (openClose.answerAreaOpen.includes(item.id)){
+                
                 <form [formGroup]="answerForm" id="answerForm">
                     <div class="form-group" >
-                      <label for="answer">Your answer</label>
-                      <input type="text" class="form-control" id="answer" placeholder="Enter your answer" formControlName="answers">
-                      <br />
+                        <label for="answer">Your answer</label>
+                        <input type="text" class="form-control" id="answer" placeholder="Enter your answer" formControlName="answers">
+                        <br />
                     </div>
                     <button type="submit" class="btn btn-primary me-2" (click)="handleFormSend(answerForm, item.id)">Submit</button>
-                    <button class="btn btn-danger me-2" (click)="closeAnswerForm(item.id)">Close</button>
+                    <button class="btn btn-danger me-2" (click)="openClose.closeAnswerForm(item.id)">Close</button>
                 </form>
-            </div>
+            }
+            @if (deepEqual(item.answers[0],{}) != true){ 
+                <h2>Answers:</h2>
+                @for (x of item.answers | sortRatings; track x) { 
+                    <ol class="bg-body-tertiary list-group">
+                        <li class="list-group-item border-bottom border-bottom-1 my-1">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <p>{{x.body}}</p>
+                                    <small>author: {{x.answerAuthorEmail}}</small><br />
+                                    <p>{{x.istrue}}</p>
+                                </div>
+                                <div class="col-md-4 text-center">
+                                    <button class="badge bg-success rounded-pill border-0 me-1" (click)="changeRate(item.id, x.answerId, 1)">&#10004;</button>
+                                    <span class="badge bg-primary rounded-pill">{{x.rate}}</span>
+                                    <button class="badge bg-warning rounded-pill border-0 ms-1" (click)="changeRate(item.id, x.answerId, -1)">&#10008;</button><br />
+
+                                    @if (x.isTrue == false && item.authorEmail == currentUserEmail){
+                                        <button class="btn btn-outline-secondary m-2" (click)="checkRightAnswer(item.id, x.answerId)" >is it right?</button>
+                                    }
+                                    @if (x.isTrue == true){
+                                        <span class="btn btn-success m-2">It is right! &#10004;</span>
+                                    }
+                            
+                                </div>
+                            </div>
+                        </li>
+                    </ol>
+                }
+            }
         </div>
     </div>
+
+    }
+
+}
+    
     
 
 
