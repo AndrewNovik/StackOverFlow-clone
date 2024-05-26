@@ -1,15 +1,15 @@
 <div class="container">
     <div class="row border-bottom">
         <div class="col-md-6">
-            <h1>Latest questions</h1>
+            <h1>Последние вопросы</h1>
         </div>
         <div class="col-md-6 text-end">
-            <button type="button" class="btn btn-info m-2" routerLink="/askque">Ask question</button>
+            <button type="button" class="btn btn-info m-2" routerLink="/askque">Задать вопрос</button>
         </div>  
     </div>
 </div>
 
-@if (data$ | async; as data) { @for (item of data; track item.id){
+@if (dataMethods.dataQuestions$ | async; as data) { @for (item of data; track item.id){
 
     <div class="card m-3 bg-body-tertiary"> 
         <div class="card-body">
@@ -17,52 +17,52 @@
                 <div class="col-md-8">
                     <a routerLink="/ask/{{item.id}}"><h3 class="card-title" >{{item.questionTitle}}</h3></a>
                     <p class="card-text">{{item.questionBody}}</p>
-                    <small class="card-text">{{item.authorEmail}}</small><br>
+                    <small class="card-text">Вопрос задал: {{item.authorEmail}}</small><br>
                 </div>
                 <div class="col-md-4 text-center">
 
-                    @if (item.authorEmail != currentUserEmail ){
-                        <button class="btn btn-primary m-2" (click)="openClose.openAnswerForm(item.id)" >Answer</button>
+                    @if (item.authorEmail != signInOut.currentUserEmail ){
+                        <button class="btn btn-primary m-2" (click)="utility.openAnswerForm(item.id)">Ответить</button>
                     }
-                    @if (IsAdmin == true){
-                        <button class="btn btn-danger m-2" (click)="DeleteQuestion(item.id)" >Del question!</button> 
+                    @if (signInOut.IsAdmin == true){
+                        <button class="btn btn-danger m-2" (click)="delQuestion(item.id)" >Удалить вопрос</button> 
                     }
                     
                 </div>
             </div>
-            @if (openClose.answerAreaOpen.includes(item.id)){
+            @if (utility.answerAreaOpen.includes(item.id)){
                 
                 <form [formGroup]="answerForm" id="answerForm">
                     <div class="form-group" >
-                        <label for="answer">Your answer</label>
-                        <input type="text" class="form-control" id="answer" placeholder="Enter your answer" formControlName="answers">
+                        <label for="answer">Ваш ответ</label>
+                        <input type="text" class="form-control" id="answer" placeholder="Введите ваш ответ" formControlName="answers">
                         <br />
                     </div>
-                    <button type="submit" class="btn btn-primary me-2" (click)="handleFormSend(answerForm, item.id)">Submit</button>
-                    <button class="btn btn-danger me-2" (click)="openClose.closeAnswerForm(item.id)">Close</button>
+                    <button type="submit" class="btn btn-primary me-2" (click)="handleFormSend(answerForm, item.id)">Подтвердить</button>
+                    <button class="btn btn-danger me-2" (click)="utility.closeAnswerForm(item.id)">Закрыть</button>
                 </form>
             }
-            @if (deepEqual(item.answers[0],{}) != true){ 
-                <h2>Answers:</h2>
+            @if (utility.deepEqual(item.answers[0],{}) != true){ 
+                <h2>Ответы:</h2>
                 @for (x of item.answers | sortRatings; track x) { 
                     <ol class="bg-body-tertiary list-group">
                         <li class="list-group-item border-bottom border-bottom-1 my-1">
                             <div class="row">
                                 <div class="col-md-8">
                                     <p>{{x.body}}</p>
-                                    <small>author: {{x.answerAuthorEmail}}</small><br />
+                                    <small>автор: {{x.answerAuthorEmail}}</small><br />
                                     <p>{{x.istrue}}</p>
                                 </div>
                                 <div class="col-md-4 text-center">
-                                    <button class="badge bg-success rounded-pill border-0 me-1" (click)="changeRate(item.id, x.answerId, 1)">&#10004;</button>
+                                    <button class="badge bg-success rounded-pill border-0 me-1" (click)="dataMethods.changeRate(item.id, x.answerId, 1)">&#10004;</button>
                                     <span class="badge bg-primary rounded-pill">{{x.rate}}</span>
-                                    <button class="badge bg-warning rounded-pill border-0 ms-1" (click)="changeRate(item.id, x.answerId, -1)">&#10008;</button><br />
+                                    <button class="badge bg-warning rounded-pill border-0 ms-1" (click)="dataMethods.changeRate(item.id, x.answerId, -1)">&#10008;</button><br />
 
-                                    @if (x.isTrue == false && item.authorEmail == currentUserEmail){
-                                        <button class="btn btn-outline-secondary m-2" (click)="checkRightAnswer(item.id, x.answerId)" >is it right?</button>
+                                    @if (x.isTrue == false && item.authorEmail == signInOut.currentUserEmail){
+                                        <button class="btn btn-outline-secondary m-2" (click)="dataMethods.checkRightAnswer(item.id, x.answerId)" >Верно?</button>
                                     }
                                     @if (x.isTrue == true){
-                                        <span class="btn btn-success m-2">It is right! &#10004;</span>
+                                        <span class="btn btn-success m-2">Автор отметил ответ как правильный!! &#10004;</span>
                                     }
                             
                                 </div>
@@ -73,9 +73,7 @@
             }
         </div>
     </div>
-
     }
-
 }
     
     

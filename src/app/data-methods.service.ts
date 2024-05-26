@@ -1,24 +1,34 @@
-import { Injectable } from '@angular/core';
-import { Firestore, addDoc, collection, doc, updateDoc } from '@angular/fire/firestore';
+import { Injectable, inject } from '@angular/core';
+import { Auth, user } from '@angular/fire/auth';
+import { Firestore, addDoc, collection, collectionData, deleteDoc, doc, updateDoc } from '@angular/fire/firestore';
+import { Observable, take } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class DataMethodsService {
 
+  firestore: Firestore = inject(Firestore);
+
+  private aCollection = collection(this.firestore, 'questions');
+  dataQuestions$: Observable<any[]> = collectionData(this.aCollection, { idField:'id'});
+
+  private aCollectionUsers = collection(this.firestore, 'Users');
+  dataUsers$:Observable<any[]> = collectionData(this.aCollectionUsers, { idField:'id'});
+
+  public auth: Auth = inject(Auth);
+  user$ = user(this.auth);
+  
+
   constructor() { }
 
-  
-  
   addData(f:any,firestoreObj:Firestore, base:string){
     const aCollection = collection(firestoreObj, base)
     addDoc(aCollection, f).then((res) => {console.log(res)}).catch((err)=>{console.log(err)})
   }
 
-
-
-  updateData(id:string, firestoreObj:Firestore, base: string, f:any){
-    const aCollection = doc(firestoreObj, base, id)
+  updateData(id:string, base: string, f:any){
+    const aCollection = doc(this.firestore, base, id)
     updateDoc(aCollection, f)
       .then(()=>{
       }).catch((err)=>{
@@ -26,5 +36,51 @@ export class DataMethodsService {
       })
   }
 
-  
+  DeleteQuestion(id:string, firestoreObj:Firestore, base: string){
+    const aCollection = doc(firestoreObj, base, id)
+    deleteDoc(aCollection).then(()=>{
+    }).catch((err)=>{
+      console.log(err)
+    })
+  }
+
+  changeRate(id:string, i:number, value:number){
+    this.dataQuestions$.pipe(take(1)).subscribe(data => {
+      let answersArr: {}[] | { answerId:number; answerAuthorEmail: string; body: string; isTrue: boolean; rate: number; }[] = [];
+      for (let x of data){
+        if (x.id == id){
+          for (let m of x.answers){
+            if (m.answerId == i){
+              m.rate = m.rate+value
+            }
+            answersArr.push(m)
+          }       
+        }     
+      }
+      this.updateData(id, 'questions',{
+        answers: answersArr
+        });
+    })
+  }
+
+
+  checkRightAnswer(id:string, i:any){
+    this.dataQuestions$.pipe(take(1)).subscribe(data => {
+      let answersArr: {}[] | { answerId:number; answerAuthorEmail: string; body: string; isTrue: boolean; rate: number; }[] = [];
+      for (let x of data){
+        if (x.id == id){
+          for (let m of x.answers){
+            
+            if (m.answerId == i){
+              m.isTrue = true
+            }
+            answersArr.push(m)
+          }       
+        }     
+      }
+      this.updateData(id, 'questions',{
+        answers: answersArr
+        });
+    })
+  }
 }

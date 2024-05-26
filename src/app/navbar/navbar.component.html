@@ -3,18 +3,18 @@
         <a class="navbar-brand col-2" routerLink="/home">{{header_logo}}</a>    
         <form class="d-flex me-2 col-6" role="search">
             <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-            <button class="btn btn-outline-success" type="submit">Search</button>
+            <button class="btn btn-outline-success" type="submit">Поиск</button>
         </form>
 
         <div class="nav-item col-4 text-end">
             @if (signInOut.login == 'Login'){
-                <button (click)="signInOut.googleSignIn()" type="button" class="btn btn-primary nav-item me-2">{{signInOut.login}}</button>
+                <button (click)="signInOut.googleSignIn()" type="button" class="btn btn-primary nav-item me-2">Войти</button>
             }
             @if (signInOut.login != 'Login'){
-                <span class="navbar-text nav-item me-2">Hi, {{signInOut.login}}</span>
+                <span class="navbar-text nav-item me-2">Привет, {{signInOut.login}}</span>
             }
             @if (signInOut.signout === 'logined'){
-                <button (click)="signInOut.signOut()" type="button" class="btn btn-danger nav-item me-2">Signout</button>
+                <button (click)="signInOut.signOut()" type="button" class="btn btn-danger nav-item me-2">Выйти</button>
             }
         </div>      
     </div>

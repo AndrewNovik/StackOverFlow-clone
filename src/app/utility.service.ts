@@ -1,10 +1,9 @@
 import { Injectable } from '@angular/core';
 
-
 @Injectable({
   providedIn: 'root'
 })
-export class OpenCloseService {
+export class UtilityService {
 
   answerAreaOpen:string[]
 
@@ -26,5 +25,11 @@ export class OpenCloseService {
       }
     }
     return this.answerAreaOpen
+  }
+
+
+
+  deepEqual (obj1: any, obj2: any){
+    return JSON.stringify(obj1)==JSON.stringify(obj2);
   }
 }

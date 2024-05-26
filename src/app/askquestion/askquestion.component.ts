@@ -3,7 +3,10 @@ import { Firestore, collection, collectionData, addDoc, doc, updateDoc, deleteDo
 
 import { FormControl, FormGroup, ReactiveFormsModule, RequiredValidator, Validators } from '@angular/forms';
 import { Auth, GoogleAuthProvider, getAuth, signInWithPopup, signOut, user } from '@angular/fire/auth';
-import { Observable, Subject, take, takeUntil } from 'rxjs';
+import { Observable, Subject, takeUntil } from 'rxjs';
+import { DataMethodsService } from '../data-methods.service';
+import { SignInOutService } from '../sign-in-out.service';
+import { UtilityService } from '../utility.service';
 
 @Component({
   selector: 'app-askquestion',
@@ -12,13 +15,17 @@ import { Observable, Subject, take, takeUntil } from 'rxjs';
 })
 export class AskquestionComponent implements OnDestroy{
 
-  private auth: Auth = inject(Auth);
-  user$ = user(this.auth);
+
+
   destroed = new Subject();
-  firestore: Firestore = inject(Firestore);
-  data!: Observable<any[]>;
 
+  constructor (
+    public dataMethods: DataMethodsService, 
+    public signInOut: SignInOutService,
+    public utility: UtilityService
+  ) {}
 
+  
   ngOnDestroy(): void {
     this.destroed.next(null);
   }
@@ -33,34 +40,20 @@ export class AskquestionComponent implements OnDestroy{
   
 
   public handleFormSend(myForm:FormGroup){
-    this.user$.pipe(takeUntil(this.destroed)).subscribe(user => {
+    this.dataMethods.user$.pipe(takeUntil(this.destroed)).subscribe(user => {
       myForm.addControl('authorEmail', new FormControl(user?.email, Validators.required));
       if(myForm.valid){
 
-        const aCollection = collection(this.firestore, 'questions')
-        this.data = collectionData(aCollection, { idField:'id'})
-        console.log(this.data);
         const isAnswered = false;
         const answers = [{}];
         const f = {isAnswered, ...myForm.value, answers};
-        this.addData(f);
-        alert('Надейтесь, что вам ответят :)')
+        this.signInOut.addData(f, this.dataMethods.firestore, 'questions');
+        alert('Ответ принят!')
 
         this.myForm.reset();
       } else {
         alert('Заполните нормально свой вопрос или авторизуйтесь!')
       }
     });    
-  }
-
-  addData(f:any){
-    const aCollection = collection(this.firestore, 'questions')
-    addDoc(aCollection, f).then((res) => {console.log(res)}).catch((err)=>{console.log(err)})
-  }  
-
-
-  // let promise = new Observable(function(obs) {
-    //   setInterval(() => obs.next('svsdv'), 1000);
-    // });
-  // promise = new Promise(function(resolver, reject) {});
+  } 
 }

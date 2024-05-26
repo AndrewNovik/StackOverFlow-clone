@@ -6,15 +6,15 @@
       <div class="col-6 py-3" >
           <form [formGroup]="myForm" id="myForm">
               <div class="form-group" >
-                <label for="title">Question title</label>
+                <label for="title">Тема вопроса</label>
                 <input type="text" class="form-control" id="title" placeholder="Enter title" formControlName="questionTitle">
               </div>
               <div class="form-group">
-                <label for="questionbody">Subject</label>
+                <label for="questionbody">Ваш вопрос:</label>
                 <input type="text" class="form-control" id="questionbody" placeholder="Your subject... or code" formControlName="questionBody">
               </div>
               <br />
-              <button type="submit" class="btn btn-primary" (click)="handleFormSend(myForm)">submit</button>
+              <button type="submit" class="btn btn-primary" (click)="handleFormSend(myForm)">Подтвердить</button>
           </form>
       </div>
   

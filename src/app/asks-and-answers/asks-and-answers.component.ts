@@ -1,10 +1,10 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { Firestore, collection, collectionData, deleteDoc, doc, updateDoc } from '@angular/fire/firestore';
 import { ActivatedRoute } from '@angular/router';
-import { Observable, Subject, take, takeUntil, zip } from 'rxjs';
-import { Location } from '@angular/common';
+import { Subject, take, takeUntil, zip } from 'rxjs';
 import { FormGroup, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
-import { Auth, user } from '@angular/fire/auth';
+import { DataMethodsService } from '../data-methods.service';
+import { SignInOutService } from '../sign-in-out.service';
+import { UtilityService } from '../utility.service';
 
 @Component({
   selector: 'app-asks-and-answers',
@@ -14,59 +14,36 @@ import { Auth, user } from '@angular/fire/auth';
 export class AsksAndAnswersComponent implements OnInit{
 
 
-  firestore: Firestore = inject(Firestore);
-  private aCollection = collection(this.firestore, 'questions');
-  data$: Observable<any[]> = collectionData(this.aCollection, { idField:'id'});
-  public idQ: any;
+  public QuestionId:any;
 
   constructor(
+    public utility: UtilityService,
     private route: ActivatedRoute,
-    private location: Location,
-    
+    public dataMethods: DataMethodsService, 
+    public signInOut: SignInOutService,   
   ) {}
 
-  private aCollectionUsers = collection(this.firestore, 'Users');
-  dataUsers$:Observable<any[]> = collectionData(this.aCollectionUsers, { idField:'id'});
-  adminEmail:string = 'vitalevich16@gmail.com';
-  IsAdmin = false;
-  dataAnswers:string[] = [];
-  answerAreaOpen:string[] = [];
+  
   destroed = new Subject();
-  private auth: Auth = inject(Auth);
-  user$ = user(this.auth);
-  currentUserEmail?:string | null = '';
-
-  deepEqual (obj1: any, obj2: any){
-    return JSON.stringify(obj1)==JSON.stringify(obj2);
-  }
+  
 
   // добавление обьекта вопроса в html
   ngOnInit(): void {
-    this.data$.pipe(takeUntil(this.destroed)).subscribe(data => {
+    this.dataMethods.dataQuestions$.pipe(takeUntil(this.destroed)).subscribe(data => {
       const id = this.route.snapshot.paramMap.get('id')
       for (let x of data){
         if (x.id == id){
-          this.idQ = x;
+          this.QuestionId = x;
         }     
       }
     })
-    this.user$.subscribe(res => {
-      if(this.adminEmail === res?.email){
-        this.IsAdmin = true;
-      }
-      this.currentUserEmail = res?.email;
-    });
+    this.signInOut.currentUser();
   }
 
 
-  DeleteQuestion(id:string){
-    const aCollection = doc(this.firestore, 'questions', id)
-    console.log()
-    deleteDoc(aCollection).then(()=>{
-      // console.log('Good');
-    }).catch((err)=>{
-      console.log(err)
-    })
+  delQuestion(id:string){
+    const base = 'questions';
+    this.dataMethods.DeleteQuestion(id, this.dataMethods.firestore, base);
   }
 
   answerForm = new UntypedFormGroup({
@@ -76,7 +53,7 @@ export class AsksAndAnswersComponent implements OnInit{
   newId:number = 0; // нужна была временное хранилище
 
   handleFormSend(newForm: FormGroup, id:string){
-    zip(this.user$, this.data$).pipe(take(1)).subscribe(([user,data]) => {
+    zip(this.dataMethods.user$, this.dataMethods.dataQuestions$).pipe(take(1)).subscribe(([user,data]) => {
       
       if(newForm.valid){
         let answersArr: {}[] | { answerId:number; answerAuthorEmail: string; body: string; isTrue: boolean; rate: number; }[] = [];
@@ -84,7 +61,7 @@ export class AsksAndAnswersComponent implements OnInit{
         for (let x of data){
           if (x.id == id){
             for (let m of x.answers){
-              if(this.deepEqual(m,{}) == true){
+              if(this.utility.deepEqual(m,{}) == true){
                 answersArr = [];
                 
               } else{
@@ -95,91 +72,18 @@ export class AsksAndAnswersComponent implements OnInit{
           }     
         }
         answersArr.push({answerId: this.newId, answerAuthorEmail:`${user?.email}`, body:`${a.answers}`, isTrue:false, rate:0});
-        this.updateData(id, {
+        this.dataMethods.updateData(id, 'questions',{
           answers:answersArr,
         }); 
 
-        
-        
-        alert('Надеемся что это ответ здорового человека!')
+        alert('Ответ принят!')
         
         this.answerForm.reset();
-        this.closeAnswerForm(id);
+        this.utility.closeAnswerForm(id);
       } else {
-        alert('Заполните нормально свой ответ или авторизуйтесь!')
+        alert('Ошибка авторизации или формы ответа!')
       }
     }); 
 
   }
-  
-  updateData(id:string, f:any){
-    const aCollection = doc(this.firestore, 'questions', id)
-
-    updateDoc(aCollection, f)
-      .then(()=>{
-      }).catch((err)=>{
-        console.log(err)
-      })
-  }
-  
-  changeRate(id:string, i:number, value:number){
-    this.data$.pipe(take(1)).subscribe(data => {
-      let answersArr: {}[] | { answerId:number; answerAuthorEmail: string; body: string; isTrue: boolean; rate: number; }[] = [];
-      for (let x of data){
-        if (x.id == id){
-          for (let m of x.answers){
-            if (m.answerId == i){
-              m.rate = m.rate+value
-            }
-            answersArr.push(m)
-          }       
-        }     
-      }
-      this.updateData(id, {
-        answers: answersArr
-        });
-    })
-  }
-
-
-  checkRightAnswer(id:string, i:any){
-    this.data$.pipe(take(1)).subscribe(data => {
-      let answersArr: {}[] | { answerId:number; answerAuthorEmail: string; body: string; isTrue: boolean; rate: number; }[] = [];
-      for (let x of data){
-        if (x.id == id){
-          for (let m of x.answers){
-            
-            if (m.answerId == i){
-              m.isTrue = true
-            }
-            answersArr.push(m)
-          }       
-        }     
-      }
-      this.updateData(id, {
-        answers: answersArr
-        });
-    })
-  }
-
-
-
-
-  // Works!
-  openAnswerForm(id:string){
-    if (this.answerAreaOpen.includes(id) != true){
-      this.answerAreaOpen.push(id);
-    }
-  }
-  // Works!
-  closeAnswerForm(id:string){
-    for (let i=0;i<this.answerAreaOpen.length;i++){
-      if (this.answerAreaOpen[i]==id){
-        this.answerAreaOpen.splice(i,1)
-      }
-    }
-  }
-  // goBack(): void {
-  //   this.location.back();
-  // }
 }
