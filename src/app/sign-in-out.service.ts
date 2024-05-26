@@ -24,6 +24,8 @@ export class SignInOutService extends DataMethodsService{
     super();
   }
 
+  
+
   googleSignIn() {
     this.auth = getAuth();
     const provider = new GoogleAuthProvider();

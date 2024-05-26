@@ -4,8 +4,6 @@
         
 
         <div class="col-md-8 py-3">
-            @for (item of dataMethods.dataQuestions$| async; track item){ 
-                @if (item.id == QuestionId.id){
                     <div class="card m-3 bg-body-tertiary">
                         <div class="card-body">
                             <div class="row">
@@ -24,7 +22,7 @@
                                     }
                                         
                                 </div>
-                                @if (utility.deepEqual(item.answers[0],{}) != true){
+                                @if (utility.deepEqual(QuestionId.answers[0],{}) != true){
                                     <div class="col-md-12">    
                                         <h2>Ответы:</h2>
                                         <ol class="bg-body-tertiary list-group">
@@ -66,8 +64,7 @@
                             </div>
                         </div>
                     </div>
-                }    
-            }    
+                  
         </div>    
         
         <app-rightcontainer class="col-2 py-3 border-start"></app-rightcontainer>

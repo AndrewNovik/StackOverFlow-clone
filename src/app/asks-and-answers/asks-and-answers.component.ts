@@ -43,7 +43,7 @@ export class AsksAndAnswersComponent implements OnInit{
 
   delQuestion(id:string){
     const base = 'questions';
-    this.dataMethods.DeleteQuestion(id, this.dataMethods.firestore, base);
+    this.dataMethods.deleteQuestion(id, this.dataMethods.firestore, base);
   }
 
   answerForm = new UntypedFormGroup({

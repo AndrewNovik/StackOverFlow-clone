@@ -36,7 +36,7 @@ export class DataMethodsService {
       })
   }
 
-  DeleteQuestion(id:string, firestoreObj:Firestore, base: string){
+  deleteQuestion(id:string, firestoreObj:Firestore, base: string){
     const aCollection = doc(firestoreObj, base, id)
     deleteDoc(aCollection).then(()=>{
     }).catch((err)=>{

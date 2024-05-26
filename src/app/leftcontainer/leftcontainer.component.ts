@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { SignInOutService } from '../sign-in-out.service';
 
 @Component({
   selector: 'app-leftcontainer',
@@ -6,5 +7,9 @@ import { Component } from '@angular/core';
   styleUrl: './leftcontainer.component.css'
 })
 export class LeftcontainerComponent {
+
+  constructor(public signInOut: SignInOutService){
+
+  }
 
 }
