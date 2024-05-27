@@ -11,5 +11,8 @@ export class NavbarComponent {
   header_logo:string = 'Stackoverflow clone';
 
   constructor(public signInOut: SignInOutService) { }
-
+  
+  ngOnInit(): void {
+    this.signInOut.currentUser();
+  }
 }

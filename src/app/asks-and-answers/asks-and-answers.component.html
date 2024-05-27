@@ -1,70 +1,10 @@
 <div class="container-md">
-    <div class="row ">
+    <div class="row">
         <app-leftcontainer class="col-2 py-3 border-end"></app-leftcontainer>
         
 
         <div class="col-md-8 py-3">
-                    <div class="card m-3 bg-body-tertiary">
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-8">
-                                    <a routerLink="/ask/{{QuestionId.id}}"><h3 class="card-title">{{QuestionId.questionTitle}}</h3></a>
-                                    <p class="card-text">{{QuestionId.questionBody}}</p>
-                                    <small class="card-text">{{QuestionId.authorEmail}}</small><br>
-                                </div>
-                                <div class="col-md-4 text-center">
-                                    
-                                    @if (QuestionId.authorEmail != signInOut.currentUserEmail){
-                                        <button class="btn btn-primary m-2" (click)="utility.openAnswerForm(QuestionId.id)" >Ответить</button>
-                                    }
-                                    @if (signInOut.IsAdmin == true) {
-                                        <button class="btn btn-danger m-2" (click)="delQuestion(QuestionId.id)" >Удалить вопрос</button>
-                                    }
-                                        
-                                </div>
-                                @if (utility.deepEqual(QuestionId.answers[0],{}) != true){
-                                    <div class="col-md-12">    
-                                        <h2>Ответы:</h2>
-                                        <ol class="bg-body-tertiary list-group">
-                                            @for (i of QuestionId.answers; track i){
-                                                <li class="list-group-item border-bottom border-bottom-1 my-1">
-                                                    <div class="row">
-                                                        <div class="col-md-8"> 
-                                                            <p>{{i.body}}</p>
-                                                            <small>author: {{i.answerAuthorEmail}}</small><br />
-                                                            <p>{{i.istrue}}</p>
-                                                        </div>
-                                                        <!--Кнопки-->
-                                                        <div class="col-md-4 text-center">
-                                                            <button class="badge bg-success rounded-pill border-0 me-1" (click)="dataMethods.changeRate(QuestionId.id, i.answerId, 1)">&#10004;</button>
-                                                            <span class="badge bg-primary rounded-pill">{{i.rate}}</span>
-                                                            <button class="badge bg-warning rounded-pill border-0 ms-1" (click)="dataMethods.changeRate(QuestionId.id, i.answerId, -1)">&#10008;</button><br />
-                                                            <button class="btn btn-outline-secondary m-2" *ngIf="i.isTrue == false && QuestionId.authorEmail == signInOut.currentUserEmail" (click)="dataMethods.checkRightAnswer(QuestionId.id, i.answerId)" >Верно?</button>
-                                                            <span class="btn btn-success m-2" *ngIf="i.isTrue == true " >Автор отметил ответ как правильный! &#10004;</span>
-                                                        </div>
-                                                    </div>
-                                                </li>
-                                            }
-                                        </ol>
-                                    </div>
-                                    <div class="col-md-12">
-                                        @if (utility.answerAreaOpen.includes(QuestionId.id)) {
-                                            <form [formGroup]="answerForm" id="answerForm">
-                                                <div class="form-group" >
-                                                <label for="answer">Ваш ответ</label>
-                                                <input type="text" class="form-control" id="answer" placeholder="Введите ваш ответ" formControlName="answers">
-                                                <br />
-                                                </div>
-                                                <button type="submit" class="btn btn-primary me-2" (click)="handleFormSend(answerForm, QuestionId.id)">Подтвердить</button>
-                                                <button class="btn btn-danger me-2" (click)="utility.closeAnswerForm(QuestionId.id)">Закрыть</button>
-                                            </form>
-                                        }
-                                    </div>
-                                }
-                            </div>
-                        </div>
-                    </div>
-                  
+            <app-question-label></app-question-label>
         </div>    
         
         <app-rightcontainer class="col-2 py-3 border-start"></app-rightcontainer>

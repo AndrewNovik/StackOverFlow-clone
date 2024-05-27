@@ -20,6 +20,7 @@ import { AskquestionComponent } from './askquestion/askquestion.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AsksAndAnswersComponent } from './asks-and-answers/asks-and-answers.component';
 import { SortRatingsPipe } from './sort-ratings.pipe';
+import { QuestionLabelComponent } from './question-label/question-label.component';
 
 @NgModule({
   declarations: [
@@ -34,7 +35,8 @@ import { SortRatingsPipe } from './sort-ratings.pipe';
     UsersListComponent,
     AskquestionComponent,
     AsksAndAnswersComponent,
-    SortRatingsPipe
+    SortRatingsPipe,
+    QuestionLabelComponent
   ],
   imports: [
     BrowserModule,

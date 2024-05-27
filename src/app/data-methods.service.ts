@@ -22,26 +22,20 @@ export class DataMethodsService {
 
   constructor() { }
 
-  addData(f:any,firestoreObj:Firestore, base:string){
-    const aCollection = collection(firestoreObj, base)
-    addDoc(aCollection, f).then((res) => {console.log(res)}).catch((err)=>{console.log(err)})
+  addData(f:any, base:string){
+    addDoc(collection(this.firestore, base), f)
   }
 
   updateData(id:string, base: string, f:any){
-    const aCollection = doc(this.firestore, base, id)
-    updateDoc(aCollection, f)
+    updateDoc(doc(this.firestore, base, id), f)
       .then(()=>{
       }).catch((err)=>{
         console.log(err)
       })
   }
 
-  deleteQuestion(id:string, firestoreObj:Firestore, base: string){
-    const aCollection = doc(firestoreObj, base, id)
-    deleteDoc(aCollection).then(()=>{
-    }).catch((err)=>{
-      console.log(err)
-    })
+  deleteQuestion(id:string){
+    deleteDoc(doc(this.firestore, 'questions', id));
   }
 
   changeRate(id:string, i:number, value:number){

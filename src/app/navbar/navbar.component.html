@@ -7,13 +7,13 @@
         </form>
 
         <div class="nav-item col-4 text-end">
-            @if (signInOut.login == 'Login'){
+            @if (signInOut.login == undefined){
                 <button (click)="signInOut.googleSignIn()" type="button" class="btn btn-primary nav-item me-2">Войти</button>
             }
-            @if (signInOut.login != 'Login'){
+            @if (signInOut.login != undefined){
                 <span class="navbar-text nav-item me-2">Привет, {{signInOut.login}}</span>
             }
-            @if (signInOut.signout === 'logined'){
+            @if (signInOut.signout == 'logined'){
                 <button (click)="signInOut.signOut()" type="button" class="btn btn-danger nav-item me-2">Выйти</button>
             }
         </div>      

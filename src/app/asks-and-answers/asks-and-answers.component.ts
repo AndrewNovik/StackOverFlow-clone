@@ -11,10 +11,7 @@ import { UtilityService } from '../utility.service';
   templateUrl: './asks-and-answers.component.html',
   styleUrl: './asks-and-answers.component.css'
 })
-export class AsksAndAnswersComponent implements OnInit{
-
-
-  public QuestionId:any;
+export class AsksAndAnswersComponent{
 
   constructor(
     public utility: UtilityService,
@@ -22,29 +19,8 @@ export class AsksAndAnswersComponent implements OnInit{
     public dataMethods: DataMethodsService, 
     public signInOut: SignInOutService,   
   ) {}
-
   
   destroed = new Subject();
-  
-
-  // добавление обьекта вопроса в html
-  ngOnInit(): void {
-    this.dataMethods.dataQuestions$.pipe(takeUntil(this.destroed)).subscribe(data => {
-      const id = this.route.snapshot.paramMap.get('id')
-      for (let x of data){
-        if (x.id == id){
-          this.QuestionId = x;
-        }     
-      }
-    })
-    this.signInOut.currentUser();
-  }
-
-
-  delQuestion(id:string){
-    const base = 'questions';
-    this.dataMethods.deleteQuestion(id, this.dataMethods.firestore, base);
-  }
 
   answerForm = new UntypedFormGroup({
     answers: new UntypedFormControl('', Validators.required),

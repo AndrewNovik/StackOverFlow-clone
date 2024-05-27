@@ -1,4 +1,5 @@
-<div class="container">
+<div class="container-md">
+
     <div class="row border-bottom">
         <div class="col-md-6">
             <h1>Последние вопросы</h1>
@@ -9,72 +10,10 @@
     </div>
 </div>
 
-@if (dataMethods.dataQuestions$ | async; as data) { @for (item of data; track item.id){
+<div class="col-md-12 py-1">
+    <app-question-label></app-question-label>
+</div>
 
-    <div class="card m-3 bg-body-tertiary"> 
-        <div class="card-body">
-            <div class="row">
-                <div class="col-md-8">
-                    <a routerLink="/ask/{{item.id}}"><h3 class="card-title" >{{item.questionTitle}}</h3></a>
-                    <p class="card-text">{{item.questionBody}}</p>
-                    <small class="card-text">Вопрос задал: {{item.authorEmail}}</small><br>
-                </div>
-                <div class="col-md-4 text-center">
-
-                    @if (item.authorEmail != signInOut.currentUserEmail ){
-                        <button class="btn btn-primary m-2" (click)="utility.openAnswerForm(item.id)">Ответить</button>
-                    }
-                    @if (signInOut.IsAdmin == true){
-                        <button class="btn btn-danger m-2" (click)="delQuestion(item.id)" >Удалить вопрос</button> 
-                    }
-                    
-                </div>
-            </div>
-            @if (utility.answerAreaOpen.includes(item.id)){
-                
-                <form [formGroup]="answerForm" id="answerForm">
-                    <div class="form-group" >
-                        <label for="answer">Ваш ответ</label>
-                        <input type="text" class="form-control" id="answer" placeholder="Введите ваш ответ" formControlName="answers">
-                        <br />
-                    </div>
-                    <button type="submit" class="btn btn-primary me-2" (click)="handleFormSend(answerForm, item.id)">Подтвердить</button>
-                    <button class="btn btn-danger me-2" (click)="utility.closeAnswerForm(item.id)">Закрыть</button>
-                </form>
-            }
-            @if (utility.deepEqual(item.answers[0],{}) != true){ 
-                <h2>Ответы:</h2>
-                @for (x of item.answers | sortRatings; track x) { 
-                    <ol class="bg-body-tertiary list-group">
-                        <li class="list-group-item border-bottom border-bottom-1 my-1">
-                            <div class="row">
-                                <div class="col-md-8">
-                                    <p>{{x.body}}</p>
-                                    <small>автор: {{x.answerAuthorEmail}}</small><br />
-                                    <p>{{x.istrue}}</p>
-                                </div>
-                                <div class="col-md-4 text-center">
-                                    <button class="badge bg-success rounded-pill border-0 me-1" (click)="dataMethods.changeRate(item.id, x.answerId, 1)">&#10004;</button>
-                                    <span class="badge bg-primary rounded-pill">{{x.rate}}</span>
-                                    <button class="badge bg-warning rounded-pill border-0 ms-1" (click)="dataMethods.changeRate(item.id, x.answerId, -1)">&#10008;</button><br />
-
-                                    @if (x.isTrue == false && item.authorEmail == signInOut.currentUserEmail){
-                                        <button class="btn btn-outline-secondary m-2" (click)="dataMethods.checkRightAnswer(item.id, x.answerId)" >Верно?</button>
-                                    }
-                                    @if (x.isTrue == true){
-                                        <span class="btn btn-success m-2">Автор отметил ответ как правильный!! &#10004;</span>
-                                    }
-                            
-                                </div>
-                            </div>
-                        </li>
-                    </ol>
-                }
-            }
-        </div>
-    </div>
-    }
-}
     
     
 

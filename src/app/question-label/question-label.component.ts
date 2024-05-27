@@ -1,37 +1,64 @@
-import { Component, OnInit} from '@angular/core';
-import { FormGroup, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
-import { Subject, take, takeUntil, zip } from 'rxjs';
+import { Component } from '@angular/core';
+import { UtilityService } from '../utility.service';
+import { ActivatedRoute } from '@angular/router';
 import { DataMethodsService } from '../data-methods.service';
 import { SignInOutService } from '../sign-in-out.service';
-import { UtilityService } from '../utility.service';
+import { FormControl, FormGroup, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
+import { ObservableInput, Subject, of, take, takeUntil, zip } from 'rxjs';
 
 @Component({
-  selector: 'app-centercontainer',
-  templateUrl: './centercontainer.component.html',
-  styleUrl: './centercontainer.component.css'
+  selector: 'app-question-label',
+  templateUrl: './question-label.component.html',
+  styleUrl: './question-label.component.css'
 })
+export class QuestionLabelComponent {
 
-export class CentercontainerComponent implements OnInit {
-
-  dataAnswers:string[] = [];
+  public QuestionId:any;
+  newId:number = 0;
   destroed = new Subject();
+  questionWall: boolean | undefined;
+  // отдельный вопрос или массив, мб прокинуть генерики на разные типы данных
 
-  constructor(
+
+
+  constructor (
     public dataMethods: DataMethodsService, 
     public signInOut: SignInOutService,
-    public utility: UtilityService
-  
-  ) { }
+    public utility: UtilityService,
+    private route: ActivatedRoute,
+
+  ) {}
 
   ngOnInit(): void {
+    this.dataMethods.dataQuestions$.pipe(takeUntil(this.destroed)).subscribe(data => {
+      const id = this.route.snapshot.paramMap.get('id');
+      // Выбор нужного вопроса с помощью снепшота ссылки
+      if ( id != null) {
+        for (let x of data){
+          if (x.id == id){
+            
+            this.QuestionId = x;
+            console.log(this.QuestionId)
+              
+            this.questionWall = false;
+          }   
+        }
+      } else {
+        this.questionWall = true;
+      }
+      
+    })
     this.signInOut.currentUser();
   }
+
+  myForm = new FormGroup({
+    questionTitle: new FormControl('', Validators.required),
+    questionBody: new FormControl('',Validators.required)
+  })
   
   answerForm = new UntypedFormGroup({
     answers: new UntypedFormControl('', Validators.required),
   })
-
-  newId:number = 0; // нужна была временное хранилище
 
   handleFormSend(newForm: FormGroup, id:string){
     zip(this.dataMethods.user$, this.dataMethods.dataQuestions$).pipe(take(1)).subscribe(([user,data]) => {
@@ -65,4 +92,7 @@ export class CentercontainerComponent implements OnInit {
       }
     }); 
   }
+
+
+
 }
